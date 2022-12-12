@@ -3,39 +3,75 @@ import App from "./App.vue";
 
 import "./assets/main.css";
 import { MapComponent } from "./esm-lib/index";
-console.log("MapComponent", MapComponent);
+const appContainer = document.getElementById("app");
 
-const app = document.getElementById("app");
+const asyncUpdate = async (graphic) => {
+    return Promise.resolve("Has been updated");
+};
 
-console.log("app", app);
+const asyncAdd = async (graphic) => {
+    console.log("graphic", graphic);
+    console.log("graphic.layer", graphic.layer);
 
-if (app) {
+    return Promise.resolve("Has been added");
+};
+
+const onSelection = async (graphic) => {
+    console.log("my selected graphic", graphic);
+
+    return Promise.resolve("Graphic has been selected");
+};
+
+if (appContainer && appContainer instanceof HTMLDivElement) {
     const token =
-        "yte8eVoSBrsnSl46zWa3il9n8v9XMSRc6pbVw48BBYAc5na9PIyhdkUlNYF2Dlo_i4R1ailTsQAXGgI35LypxuwzS282iZZ9_FvqI6nuFU5UKPDxHoXnZ8IYUQ96kNNbaGHxqz71dtSeuRtEIbBeOxgbtmrHLnG1yuXj5f_-t5NO9Ixlor2bzRHCMZ-mI8s2";
-    const test = new MapComponent(
-        [
-            {
-                url: "https://services-eu1.arcgis.com/kkoySFboPZ70Z0Od/arcgis/rest/services/Grid_Map/FeatureServer/0",
-                token: token,
-            },
-            {
-                url: "https://services-eu1.arcgis.com/kkoySFboPZ70Z0Od/arcgis/rest/services/Grid_Map/FeatureServer/1",
-                token: token,
-            },
-        ],
-        app,
-        "gray-vector",
+        "LkDUVvMvlQ64lnDP1ltMMf5KtPmm_VU2K86BZ7oxtCdqqryM4Ojdiw3YZp_tzkECQ7H-MwrY63OZceBxw8ij2a3Rctpjz5Tc7zqh7UrqQi54RQbRDPqXEIsFtBy1nelVdLqh8AnYTX-Qc2Ky8hzMsaSzWAvHxlBMDa6cFO7O4rEcMFL4DL4ia8bh0or2-BX6";
+    const mapComponent = new MapComponent({
+        nodeLayer: {
+            layerUrl:
+                "https://services-eu1.arcgis.com/kkoySFboPZ70Z0Od/arcgis/rest/services/Grid_Map_Dev/FeatureServer/0",
+            minScale: 2000000,
+            //maxScale: 1000,
+        },
 
-        {
+        edgeLayer: {
+            layerUrl:
+                "https://services-eu1.arcgis.com/kkoySFboPZ70Z0Od/arcgis/rest/services/Grid_Map_Dev/FeatureServer/1",
+            minScale: 30000000, //bit smaller than europre
+
+            //minScale: 37000000,
+            //maxScale: 1000,
+        },
+        token: token,
+        container: appContainer,
+        basemap: "gray-vector",
+        bbox: {
             xmin: 1237457.7355,
             ymin: -255015.750799999,
             xmax: 7327515.4867,
             ymax: 5287355.8792,
             wkid: 3034,
-        }
-    );
+        },
+        updateCallback: asyncUpdate,
+        addCallback: asyncAdd,
+        selectCallBack: onSelection,
+    });
 
-    test.launch();
+    mapComponent.launch();
+
+    //mapComponent.sketchWidget.createFeature(EntsoeGeometryType.edge);
+
+    //mapComponent.refreshLayers();
+
+    /*  mapComponent
+        .getFeatureAsync(7520, mapComponent.nodeFeatureLayer)
+        .then((featureSet) => {
+            console.log("featureSet", featureSet);
+            if (featureSet.features[0]) {
+                mapComponent.selectFeature(featureSet.features[0]);
+                if (mapComponent.selectedFeature)
+                    mapComponent.sketchWidget.updateFeature(
+                        mapComponent.selectedFeature
+                    );
+            }
+        }); */
 }
-
-//createApp(App).mount("#app");
